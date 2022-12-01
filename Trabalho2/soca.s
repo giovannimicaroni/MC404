@@ -10,12 +10,6 @@ isr_stack:
 .skip 1024
 isr_stack_end: .skip 4
 
-program_stack:
-.skip 1024
-program_stack_end: .skip 4
-
-
-
 
 .text
 
@@ -176,6 +170,20 @@ syscall_read:
         mv a0, a2
         ret
 
+syscall_write:
+    
+    
+    ret
+
+syscall_draw_line:
+
+
+    ret
+
+syscall_get_systime:
+
+
+    ret
 
 #-------------------------START--------------------------------------------------------- 
 .globl _start
@@ -184,7 +192,7 @@ _start:
     la t0, int_handler  # Carregar o endereço da rotina que tratará as interrupções
     csrw mtvec, t0      # (e syscalls) em no registrador MTVEC para configurar
                         # o vetor de interrupções.
-    la sp, program_stack_end
+    li sp, 0x07FFFFFC
     la t0, isr_stack_end
     csrw mscratch, t0
     # Escreva aqui o código para mudar para modo de usuário e chamar a função 
@@ -195,7 +203,7 @@ _start:
     and t1, t1, t2 # with value 00 (U-mode)
     csrw mstatus, t1 
 
-    la t0, user_main # Loads the user software ***MUDAR O NOME PRA FUNÇAO CERTA
+    la t0, main # Loads the user software ***MUDAR O NOME PRA FUNÇAO CERTA
     csrw mepc, t0 # entry point into mepc
     mret # PC <= MEPC; mode <= MPP;
 
