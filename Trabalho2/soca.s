@@ -1,4 +1,7 @@
-.set CONTROLECARRO,0xFFFF0100
+.set GPT, 0xFFFF0100
+.set CONTROLECARRO,0xFFFF0300
+.set SERIAL, 0xFFFF0500
+.set canvas, 0xFFFF0700
 
 
 .bss
@@ -104,7 +107,7 @@ syscall_read_sensors:
 
 syscall_read_sensor_distance:
     li t1, CONTROLECARRO
-    li t0, 1
+    li t0, 2
     sb t0, 2(t1)
     li t0, 0
     1:
@@ -148,6 +151,31 @@ syscall_get_rotation:
         sw t0, 0(a1)
         lw t0, 12(t1)
         sw t0, 0(a2)
+
+syscall_read:
+    li t1, SERIAL
+    li t3, 0
+    4:
+        beq t3, a2, 3f
+        li t0, 1
+        sb t0, 2(t1)
+        li t0, 0
+        1:
+            lb t2, 2(t1)
+            beq t2, t0, 2f
+            j 1b
+        2:
+            lb t0, 3(t1)
+            sb t0, 0(a1)
+            addi a1, a1, 1
+            addi t3, t3, 1
+            j 4b
+
+
+    3:
+        mv a0, a2
+        ret
+
 
 #-------------------------START--------------------------------------------------------- 
 .globl _start
