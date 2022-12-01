@@ -98,6 +98,57 @@ syscall_set_handbreak:
         sb a0, 34(t1)
         ret
 
+syscall_read_sensors:
+    li t1, CONTROLECARRO
+
+
+syscall_read_sensor_distance:
+    li t1, CONTROLECARRO
+    li t0, 1
+    sb t0, 2(t1)
+    li t0, 0
+    1:
+        lb t2, 2(t1)
+        beq t2, t0, 2f
+        j 1b
+    2:
+        lw a0, 28(t1)
+        ret
+
+syscall_get_position:
+    li t1, CONTROLECARRO
+    li t0, 1
+    sb t0, 0(t1)
+    li t0, 0
+    1:
+        lb t2, 0(t1)
+        beq t2, t0, 2f
+        j 1b
+    2:
+        lw t0, 16(t1)
+        sw t0, 0(a0)
+        lw t0, 20(t1)
+        sw t0, 0(a1)
+        lw t0, 24(t1)
+        sw t0, 0(a2)
+
+syscall_get_rotation:
+    li t1, CONTROLECARRO
+    li t0, 1
+    sb t0, 0(t1)
+    li t0, 0
+    1:
+        lb t2, 0(t1)
+        beq t2, t0, 2f
+        j 1b
+    2:
+        lw t0, 4(t1)
+        sw t0, 0(a0)
+        lw t0, 8(t1)
+        sw t0, 0(a1)
+        lw t0, 12(t1)
+        sw t0, 0(a2)
+
 #-------------------------START--------------------------------------------------------- 
 .globl _start
 _start:
