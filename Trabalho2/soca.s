@@ -1,9 +1,11 @@
+#----------------------------CONSTANTES-------------------------------------
+
 .set GPT, 0xFFFF0100
 .set CONTROLECARRO,0xFFFF0300
 .set SERIAL, 0xFFFF0500
 .set canvas, 0xFFFF0700
 
-
+#-----------------------------VETORES E VARIÁVEIS------------------------------
 .bss
 .align 4
 isr_stack:
@@ -11,12 +13,10 @@ isr_stack:
 isr_stack_end: .skip 4
 
 
-.text
-
 #-------------------------ROTINA DE TRATAMENTO DE EXCEÇÕES E INTERRUPÇÕES POR SOFTWARE--------------------------------- 
-
+.text
 int_handler:
-    ###### Tratador de interrupções e syscalls ######
+    ###### Tratador de interrupções e Syscalls ######
 
     #Salvando o contexto
     csrrw sp, mscratch, sp # Troca sp com mscratch
@@ -25,27 +25,27 @@ int_handler:
     sw a1, 4(sp) # Salva a1
     sw a7, 8(sp)
 
-    #Tratamento das syscalls  
+    #Tratamento das Syscalls  
     li t1, 10
-    beq a7, t1, syscall_set_motor
+    beq a7, t1, Syscall_set_motor
     li t1, 11
-    beq a7, t1, syscall_set_handbreak
+    beq a7, t1, Syscall_set_handbreak
     li t1, 12
-    beq a7, t1, syscall_read_sensors
+    beq a7, t1, Syscall_read_sensors
     li t1, 13
-    beq a7, t1, syscall_read_sensor_distance
+    beq a7, t1, Syscall_read_sensor_distance
     li t1, 15
-    beq a7, t1, syscall_get_position
+    beq a7, t1, Syscall_get_position
     li t1, 16
-    beq a7, t1, syscall_get_rotation
+    beq a7, t1, Syscall_get_rotation
     li t1, 17
-    beq a7, t1, syscall_read
+    beq a7, t1, Syscall_read
     li t1, 18
-    beq a7, t1, syscall_write
+    beq a7, t1, Syscall_write
     li t1, 19
-    beq a7, t1, syscall_draw_line
+    beq a7, t1, Syscall_draw_line
     li t1, 20
-    beq a7, t1, syscall_get_systime
+    beq a7, t1, Syscall_get_systime
 
     #Recupera o contexto
     lw a7, 8(sp)
@@ -54,14 +54,14 @@ int_handler:
     addi sp, sp, 64 # Desaloca espaço da pilha
     csrrw sp, mscratch, sp # Troca sp com mscratch novamente
     csrr t0, mepc  # carrega endereço de retorno (endereço 
-                    # da instrução que invocou a syscall)
+                    # da instrução que invocou a Syscall)
     addi t0, t0, 4 # soma 4 no endereço de retorno (para retornar após a ecall) 
     csrw mepc, t0  # armazena endereço de retorno de volta no mepc
     mret           # Recuperar o restante do contexto (pc <- mepc)
 
 #-------------------------SYSCALLS--------------------------------------------------------- 
 
-syscall_set_motor:
+Syscall_set_motor:
     li t1, CONTROLECARRO
     li t0, 0
     li t2, 127
@@ -82,7 +82,7 @@ syscall_set_motor:
     li a0, 0
     ret
 
-syscall_set_handbreak:
+Syscall_set_handbreak:
     li t1, CONTROLECARRO
     li t0, 0
     blt a0, t0, 1f
@@ -95,11 +95,11 @@ syscall_set_handbreak:
         sb a0, 34(t1)
         ret
 
-syscall_read_sensors:
+Syscall_read_sensors:
     li t1, CONTROLECARRO
 
 
-syscall_read_sensor_distance:
+Syscall_read_sensor_distance:
     li t1, CONTROLECARRO
     li t0, 2
     sb t0, 2(t1)
@@ -112,7 +112,7 @@ syscall_read_sensor_distance:
         lw a0, 28(t1)
         ret
 
-syscall_get_position:
+Syscall_get_position:
     li t1, CONTROLECARRO
     li t0, 1
     sb t0, 0(t1)
@@ -129,7 +129,7 @@ syscall_get_position:
         lw t0, 24(t1)
         sw t0, 0(a2)
 
-syscall_get_rotation:
+Syscall_get_rotation:
     li t1, CONTROLECARRO
     li t0, 1
     sb t0, 0(t1)
@@ -146,7 +146,7 @@ syscall_get_rotation:
         lw t0, 12(t1)
         sw t0, 0(a2)
 
-syscall_read:
+Syscall_read:
     li t1, SERIAL
     li t3, 0
     4:
@@ -170,17 +170,17 @@ syscall_read:
         mv a0, a2
         ret
 
-syscall_write:
+Syscall_write:
     
     
     ret
 
-syscall_draw_line:
+Syscall_draw_line:
 
 
     ret
 
-syscall_get_systime:
+Syscall_get_systime:
 
 
     ret
@@ -190,7 +190,7 @@ syscall_get_systime:
 _start:
 
     la t0, int_handler  # Carregar o endereço da rotina que tratará as interrupções
-    csrw mtvec, t0      # (e syscalls) em no registrador MTVEC para configurar
+    csrw mtvec, t0      # (e Syscalls) em no registrador MTVEC para configurar
                         # o vetor de interrupções.
     li sp, 0x07FFFFFC
     la t0, isr_stack_end
