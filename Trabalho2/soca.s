@@ -1,7 +1,7 @@
 #----------------------------CONSTANTES-------------------------------------
 
 .set GPT, 0xFFFF0100
-.set CONTROLECARRO,0xFFFF0300
+.set CONTROLECARRO, 0xFFFF0300
 .set SERIAL, 0xFFFF0500
 .set canvas, 0xFFFF0700
 
@@ -24,30 +24,33 @@ int_handler:
     sw a0, 0(sp) # Salva a0
     sw a1, 4(sp) # Salva a1
     sw a7, 8(sp)
+    sw t1, 12(sp)
 
     #Tratamento das Syscalls  
     li t1, 10
     beq a7, t1, Syscall_set_motor
     li t1, 11
     beq a7, t1, Syscall_set_handbreak
-    li t1, 12
-    beq a7, t1, Syscall_read_sensors
+    # li t1, 12
+    # beq a7, t1, Syscall_read_sensors
     li t1, 13
     beq a7, t1, Syscall_read_sensor_distance
     li t1, 15
     beq a7, t1, Syscall_get_position
     li t1, 16
     beq a7, t1, Syscall_get_rotation
-    li t1, 17
-    beq a7, t1, Syscall_read
-    li t1, 18
-    beq a7, t1, Syscall_write
-    li t1, 19
-    beq a7, t1, Syscall_draw_line
-    li t1, 20
-    beq a7, t1, Syscall_get_systime
+    # li t1, 17
+    # beq a7, t1, Syscall_read
+    # li t1, 18
+    # beq a7, t1, Syscall_write
+    # li t1, 19
+    # beq a7, t1, Syscall_draw_line
+    # li t1, 20
+    # beq a7, t1, Syscall_get_systime
 
+    recupera:
     #Recupera o contexto
+    lw t1, 12(sp)
     lw a7, 8(sp)
     lw a1, 4(sp) # Recupera a1
     lw a0, 0(sp) # Recupera a0
@@ -75,12 +78,14 @@ Syscall_set_motor:
     j 2f
     1:
     li a0, -1
-    ret
+    sw a0, 0(sp)
+    j recupera
     2:
     sb a0, 33(t1)
     sb a1, 32(t1)
     li a0, 0
-    ret
+    sw a0, 0(sp)
+    j recupera
 
 Syscall_set_handbreak:
     li t1, CONTROLECARRO
@@ -90,13 +95,14 @@ Syscall_set_handbreak:
     bgt a0, t0, 1f
     j 2f
     1:
-        ret
+        j recupera 
     2:
         sb a0, 34(t1)
-        ret
+        j recupera
 
-Syscall_read_sensors:
-    li t1, CONTROLECARRO
+# Syscall_read_sensors:
+#     li t1, CONTROLECARRO
+#     ret
 
 
 Syscall_read_sensor_distance:
@@ -110,7 +116,8 @@ Syscall_read_sensor_distance:
         j 1b
     2:
         lw a0, 28(t1)
-        ret
+        sw a0, 0(sp)
+        j recupera
 
 Syscall_get_position:
     li t1, CONTROLECARRO
@@ -128,6 +135,7 @@ Syscall_get_position:
         sw t0, 0(a1)
         lw t0, 24(t1)
         sw t0, 0(a2)
+        j recupera
 
 Syscall_get_rotation:
     li t1, CONTROLECARRO
@@ -145,45 +153,46 @@ Syscall_get_rotation:
         sw t0, 0(a1)
         lw t0, 12(t1)
         sw t0, 0(a2)
+        j recupera
 
-Syscall_read:
-    li t1, SERIAL
-    li t3, 0
-    4:
-        beq t3, a2, 3f
-        li t0, 1
-        sb t0, 2(t1)
-        li t0, 0
-        1:
-            lb t2, 2(t1)
-            beq t2, t0, 2f
-            j 1b
-        2:
-            lb t0, 3(t1)
-            sb t0, 0(a1)
-            addi a1, a1, 1
-            addi t3, t3, 1
-            j 4b
+# Syscall_read:
+#     li t1, SERIAL
+#     li t3, 0
+#     4:
+#         beq t3, a2, 3f
+#         li t0, 1
+#         sb t0, 2(t1)
+#         li t0, 0
+#         1:
+#             lb t2, 2(t1)
+#             beq t2, t0, 2f
+#             j 1b
+#         2:
+#             lb t0, 3(t1)
+#             sb t0, 0(a1)
+#             addi a1, a1, 1
+#             addi t3, t3, 1
+#             j 4b
 
 
-    3:
-        mv a0, a2
-        ret
+#     3:
+#         mv a0, a2
+#         ret
 
-Syscall_write:
+# Syscall_write:
     
     
-    ret
+#     ret
 
-Syscall_draw_line:
-
-
-    ret
-
-Syscall_get_systime:
+# Syscall_draw_line:
 
 
-    ret
+#     ret
+
+# Syscall_get_systime:
+
+
+#     ret
 
 #-------------------------START--------------------------------------------------------- 
 .globl _start
