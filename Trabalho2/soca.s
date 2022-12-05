@@ -31,18 +31,18 @@ int_handler:
     beq a7, t1, Syscall_set_motor
     li t1, 11
     beq a7, t1, Syscall_set_handbreak
-    # li t1, 12
-    # beq a7, t1, Syscall_read_sensors
+    li t1, 12
+    beq a7, t1, Syscall_read_sensors
     li t1, 13
     beq a7, t1, Syscall_read_sensor_distance
     li t1, 15
     beq a7, t1, Syscall_get_position
     li t1, 16
     beq a7, t1, Syscall_get_rotation
-    # li t1, 17
-    # beq a7, t1, Syscall_read
-    # li t1, 18
-    # beq a7, t1, Syscall_write
+    li t1, 17
+    beq a7, t1, Syscall_read
+    li t1, 18
+    beq a7, t1, Syscall_write
     # li t1, 19
     # beq a7, t1, Syscall_draw_line
     # li t1, 20
@@ -100,9 +100,28 @@ Syscall_set_handbreak:
         sb a0, 34(t1)
         j recupera
 
-# Syscall_read_sensors:
-#     li t1, CONTROLECARRO
-#     ret
+Syscall_read_sensors:
+    li t1, CONTROLECARRO
+    li t0, 1
+    sb t0, 1(t1)
+    li t0, 0
+    1:
+        lb t2, 1(t1)
+        beq t2, t0, 2f
+        j 1b
+    2:
+        li t0, 0
+        li t2, 256
+        addi t4, t1, 0x24
+        3:
+        lb t3, 0(t4)
+        sb t3, 0(a0)
+        addi a0, a0, 1
+        addi t4, t4, 1
+        addi t0, t0, 1
+        blt t0, t2, 3b
+        j recupera
+
 
 
 Syscall_read_sensor_distance:
@@ -155,34 +174,54 @@ Syscall_get_rotation:
         sw t0, 0(a2)
         j recupera
 
-# Syscall_read:
-#     li t1, SERIAL
-#     li t3, 0
-#     4:
-#         beq t3, a2, 3f
-#         li t0, 1
-#         sb t0, 2(t1)
-#         li t0, 0
-#         1:
-#             lb t2, 2(t1)
-#             beq t2, t0, 2f
-#             j 1b
-#         2:
-#             lb t0, 3(t1)
-#             sb t0, 0(a1)
-#             addi a1, a1, 1
-#             addi t3, t3, 1
-#             j 4b
+Syscall_read:
+    li t1, SERIAL
+    li t3, 0
+    mv t4, a1
+    4:
+        beq t3, a2, 3f
+        li t0, 1
+        sb t0, 2(t1)
+        li t0, 0
+        1:
+            lb t2, 2(t1)
+            beq t2, t0, 2f
+            j 1b
+        2:
+            lb t0, 3(t1)
+            sb t0, 0(t4)
+            addi t4, t4, 1
+            addi t3, t3, 1
+            j 4b
 
 
-#     3:
-#         mv a0, a2
-#         ret
+    3:
+        sw a2, 0(sp)
+        j recupera
 
-# Syscall_write:
+Syscall_write:
+    li t1, SERIAL
+    li t3, 0
+    mv t4, a1
+    4:
+        beq t3, a2, 3f
+        li t0, 1
+        lb t5, 0(t4)
+        sb t5, 1(t1)
+        sb t0, 0(t1)
+        li t0, 0
+        1:
+            lb t2, 0(t1)
+            beq t2, t0, 2f
+            j 1b
+        2:
+            addi t4, t4, 1
+            addi t3, t3, 1
+            j 4b
+
+    3:
+        j recupera
     
-    
-#     ret
 
 # Syscall_draw_line:
 
