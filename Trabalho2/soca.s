@@ -3,7 +3,7 @@
 .set GPT, 0xFFFF0100
 .set CONTROLECARRO, 0xFFFF0300
 .set SERIAL, 0xFFFF0500
-.set canvas, 0xFFFF0700
+.set CANVAS, 0xFFFF0700
 
 #-----------------------------VETORES E VARIÁVEIS------------------------------
 .bss
@@ -223,15 +223,47 @@ Syscall_write:
         j recupera
     
 
-# Syscall_draw_line:
+Syscall_draw_line: //paia essa aqui
+    li t1, CANVAS
+    li t0, 256
+    sh t0, 2(t1)
+    li t0, 0
+    sw t0, 4(t1)
+    mv t2, a0
 
+    1:
+    li t5, 255
+    beq t0, t5, 2f
+    slli t5, t5, 12
+    lw t4, 0(t2)
+    mv t3, t4
+    slli t6, t4, 8
+    slli t3, t3, 4
+    add t5, t5, t6
+    add t5, t5, t3
+    add t5, t5, t4
+    
+    
+    sw t5, 8(t1)
+    addi t1, t1, 4
+    addi t0, t0, 1
+    2:
+    j recupera
 
-#     ret
+Syscall_get_systime:
+    li t1, GPT
+    li t0, 1
+    sb t0, 0(t1)
+    li t0, 0
+    1:
+        lb t2, 0(t1)
+        beq t2, t0, 2f
+        j 1b
 
-# Syscall_get_systime:
-
-
-#     ret
+    2:
+        lw t3, 4(t1)
+        sw t3, 0(sp)
+        j recupera
 
 #-------------------------START--------------------------------------------------------- 
 .globl _start
