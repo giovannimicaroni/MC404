@@ -45,8 +45,8 @@ int_handler:
     beq a7, t1, Syscall_write
     # li t1, 19
     # beq a7, t1, Syscall_draw_line
-    # li t1, 20
-    # beq a7, t1, Syscall_get_systime
+    li t1, 20
+    beq a7, t1, Syscall_get_systime
 
     recupera:
     #Recupera o contexto
@@ -225,30 +225,107 @@ Syscall_write:
 
 Syscall_draw_line: //paia essa aqui
     li t1, CANVAS
-    li t0, 256
-    sh t0, 2(t1)
-    li t0, 0
-    sw t0, 4(t1)
-    mv t2, a0
-
+    li t0, 126
+    li t5, 0
+    mv t4, a0
+    addi t3, t1, 8
     1:
-    li t5, 255
-    beq t0, t5, 2f
-    slli t5, t5, 12
-    lw t4, 0(t2)
-    mv t3, t4
-    slli t6, t4, 8
-    slli t3, t3, 4
-    add t5, t5, t6
-    add t5, t5, t3
-    add t5, t5, t4
+        beq t5, t0, 4f
+        lb t2, 0(t4)
+        sb t2, 0(t3)
+        sb t2, 1(t3)
+        sb t2, 2(t3)
+        li t6, 255
+        sb t6, 3(t3)
+        li t6, 504
+        sh t6, 2(t1)
+        li t6, 0
+        sw t6, 4(t1)
+
+        li t6, 1
+        sb t6, 0(t1)
+        li t6, 0
+        2:
+            lb a4, 0(t1)
+            beq a4, t6, 3f
+            j 2b
+        3:
+            addi t5, t5, 1
+            addi t4, t4, 1
+            addi t3, t3, 4
+            j 1b
+    4:
+        li t5, 0
+        addi t3, t1, 8
+        5:
+            beq t5, t0, 8f
+            lb t2, 0(t4)
+            sb t2, 0(t3)
+            sb t2, 1(t3)
+            sb t2, 2(t3)
+            li t6, 255
+            sb t6, 3(t3)
+
+            li t6, 504
+            sh t6, 2(t1)
+            sw t6, 4(t1)
+
+            li t6, 1
+            sb t6, 0(t1)
+            li t6, 0
+            6:
+                lb a4, 0(t1)
+                beq a4, t6, 7f
+                j 6b
+        7:
+            addi t5, t5, 1
+            addi t4, t4, 1
+            addi t3, t3, 4
+            j 5b
+    8:
+    li t5, 0
+    li t0, 4
+    addi t3, t1, 8
+    9:
+        beq t5, t0, 12f
+        lb t2, 0(t4)
+        sb t2, 0(t3)
+        sb t2, 1(t3)
+        sb t2, 2(t3)
+        li t6, 255
+        sb t6, 3(t3)
+
+        li t6, 16
+        sh t6, 2(t1)
+        li t6, 1008
+        sw t6, 4(t1)
+
+        li t6, 1
+        sb t6, 0(t1)
+        li t6, 0
+        10:
+            lb a4, 0(t1)
+            beq a4, t6, 11f
+            j 10b
+    11:
+        addi t5, t5, 1
+        addi t4, t4, 1
+        addi t3, t3, 4
+        j 9b
     
-    
-    sw t5, 8(t1)
-    addi t1, t1, 4
-    addi t0, t0, 1
-    2:
-    j recupera
+    12:
+        j recupera
+
+
+
+
+
+
+
+
+
+
+
 
 Syscall_get_systime:
     li t1, GPT
