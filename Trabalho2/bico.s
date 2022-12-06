@@ -58,13 +58,48 @@ display_image:
     ret
 
 #---------------------------OUTRAS-----------------------------
-.globl puts
+.globl puts #a0 -> endereço do inicio da string
 puts:
-    ret
+    mv t1, a0
+    mv a1, a0
+    li t0, 0
+    li a2, 0
+    1:
+        lb t2, 0(t1)
+        beq t2, t0, 2f
+        addi t1, t1, 1
+        addi a2, a2, 1
+        j 1b
+    2:
+        li t0, '\n'
+        sb t0, 0(t1)
+        li a7, 18
+        li a0, 1
+        ecall
+        ret
+
 
 .globl gets
 gets:
-    ret
+    addi sp, sp, -4 
+    sw a0, 0(sp)
+    mv a1, a0
+    li t1, '\n'
+    li t2, 0
+    1:
+        li a0, 0
+        li a2, 1
+        li a7, 17
+        ecall
+        lb t0, 0(a1)
+        beq t0, t1, 2f
+        blt t0, t2, 2f
+        addi a1, a1, 1
+        j 1b
+    2:
+        sb t2, 0(a1)
+        ret
+
 
 .globl atoi
 atoi:
