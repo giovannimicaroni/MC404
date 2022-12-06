@@ -43,8 +43,8 @@ int_handler:
     beq a7, t1, Syscall_read
     li t1, 18
     beq a7, t1, Syscall_write
-    # li t1, 19
-    # beq a7, t1, Syscall_draw_line
+    li t1, 19
+    beq a7, t1, Syscall_draw_line
     li t1, 20
     beq a7, t1, Syscall_get_systime
 
@@ -317,16 +317,6 @@ Syscall_draw_line: //paia essa aqui
         j recupera
 
 
-
-
-
-
-
-
-
-
-
-
 Syscall_get_systime:
     li t1, GPT
     li t0, 1
@@ -336,7 +326,6 @@ Syscall_get_systime:
         lb t2, 0(t1)
         beq t2, t0, 2f
         j 1b
-
     2:
         lw t3, 4(t1)
         sw t3, 0(sp)
