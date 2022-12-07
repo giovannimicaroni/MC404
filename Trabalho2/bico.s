@@ -66,15 +66,14 @@ puts:
     li a2, 1
     1:
         lb t2, 0(t1)
-        beq t2, t0, hahaahha
+        beq t2, t0, 2f
         mv a1, t1
         li a7, 18
         li a0, 1
         ecall
-    kekw:
         addi t1, t1, 1
         j 1b
-    hahaahha:
+    2:
         la a1, barra_n
         li a7, 18
         li a0, 1
