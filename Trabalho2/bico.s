@@ -67,12 +67,14 @@ puts:
     1:
         lb t2, 0(t1)
         beq t2, t0, 2f
+        li a7, 18
+        li a0, 1
+        ecall
         addi t1, t1, 1
         addi a2, a2, 1
         j 1b
     2:
-        li t0, '\n'
-        sb t0, 0(t1)
+        li a1, '\n'
         li a7, 18
         li a0, 1
         ecall
@@ -92,9 +94,8 @@ gets:
         li a7, 17
         ecall
         lb t0, 0(a1)
-        beq t0, t1, 2f
-        blt t0, t2, 2f
         addi a1, a1, 1
+        beq t0, t1, 2f
         j 1b
     2:
         sb t2, 0(a1)
