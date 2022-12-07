@@ -104,7 +104,39 @@ gets:
 
 .globl atoi
 atoi:
-    ret
+    li t0, ' '
+    mv a1, a0
+    li t3, 0
+    li t4, 10
+    li t6, '0'
+    1:
+        lb t2, 0(a1) 
+        addi a1, a1, 1
+        bne t2, t0, 2f
+        j 1b
+    2:
+        li t0, '0'
+        li t1, '9'
+        li t5, 0
+    3:
+        beq t2, t5, 5f
+        blt t2, t0, 4f
+        bgt t2, t1, 4f
+        mul t3, t3, t4
+        sub t2, t2, t6
+        add t3, t3, t2
+    4:
+        lb t2, 0(a1)
+        addi a1, a1, 1
+        j 3b
+    
+    5:
+        mv a0, t3
+        ret
+
+
+
+
 
 .globl itoa
 itoa:
