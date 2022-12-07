@@ -4,9 +4,10 @@
 .globl main
 main:
     la a0, buffer
-    jal gets
+    jal puts
+    aaa:
+        j aaa
 
 
-.bss
 .align 4
-buffer: .skip 0x24 
+buffer: .ascii "HELLO\0"

@@ -15,8 +15,7 @@ isr_stack_end: .skip 4
 
 #-------------------------ROTINA DE TRATAMENTO DE EXCEÇÕES E INTERRUPÇÕES POR SOFTWARE--------------------------------- 
 .text
-.globl int_handler
-.globl aaa
+
 int_handler:
     ###### Tratador de interrupções e Syscalls ######
 
@@ -41,7 +40,6 @@ int_handler:
     sw a7, 60(sp)
 
     #Tratamento das Syscalls  
-aaa:
     li t1, 10
     beq a7, t1, Syscall_set_motor
     li t1, 11
