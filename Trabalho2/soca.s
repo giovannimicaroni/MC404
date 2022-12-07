@@ -206,6 +206,7 @@ Syscall_get_rotation:
 Syscall_read:
     li t1, SERIAL
     li t3, 0
+    li t5, 0
     mv t4, a1
     4:
         beq t3, a2, 3f
@@ -218,6 +219,7 @@ Syscall_read:
             j 1b
         2:
             lb t0, 3(t1)
+            beq t0, t5, 4b 
             sb t0, 0(t4)
             addi t4, t4, 1
             addi t3, t3, 1

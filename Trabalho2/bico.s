@@ -83,9 +83,8 @@ puts:
 
 .globl gets
 gets:
-    addi sp, sp, -4 
-    sw a0, 0(sp)
     mv a1, a0
+    mv t3, a0
     li t1, '\n'
     li t2, 0
     1:
@@ -94,11 +93,12 @@ gets:
         li a7, 17
         ecall
         lb t0, 0(a1)
-        addi a1, a1, 1
         beq t0, t1, 2f
+        addi a1, a1, 1
         j 1b
     2:
         sb t2, 0(a1)
+        mv a0, t3
         ret
 
 

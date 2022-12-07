@@ -1,10 +1,12 @@
 
 .text
+.align 4
 .globl main
 main:
-    la a0, string
-    jal puts
-    alou:
-        j alou
+    la a0, buffer
+    jal gets
 
-string: .ascii "123\n\0"
+
+.bss
+.align 4
+buffer: .skip 0x24 
