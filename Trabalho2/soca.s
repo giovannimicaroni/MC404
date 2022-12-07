@@ -15,6 +15,8 @@ isr_stack_end: .skip 4
 
 #-------------------------ROTINA DE TRATAMENTO DE EXCEÇÕES E INTERRUPÇÕES POR SOFTWARE--------------------------------- 
 .text
+.globl int_handler
+.globl aaa
 int_handler:
     ###### Tratador de interrupções e Syscalls ######
 
@@ -25,8 +27,21 @@ int_handler:
     sw a1, 4(sp) # Salva a1
     sw a7, 8(sp)
     sw t1, 12(sp)
+    sw t0, 16(sp)
+    sw t2, 20(sp)
+    sw t3, 24(sp)
+    sw t4, 28(sp)
+    sw t5, 32(sp)
+    sw t6, 36(sp)
+    sw a2, 40(sp)
+    sw a3, 44(sp)
+    sw a4, 48(sp)
+    sw a5, 52(sp)
+    sw a6, 56(sp)
+    sw a7, 60(sp)
 
     #Tratamento das Syscalls  
+aaa:
     li t1, 10
     beq a7, t1, Syscall_set_motor
     li t1, 11
@@ -50,16 +65,30 @@ int_handler:
 
     recupera:
     #Recupera o contexto
+    csrr t0, mepc  # carrega endereço de retorno (endereço 
+                    # da instrução que invocou a Syscall)
+    addi t0, t0, 4 # soma 4 no endereço de retorno (para retornar após a ecall) 
+    csrw mepc, t0  # armazena endereço de retorno de volta no mepc
+
+    lw t0, 16(sp)
+    lw t2, 20(sp)
+    lw t3, 24(sp)
+    lw t4, 28(sp)
+    lw t5, 32(sp)
+    lw t6, 36(sp)
+    lw a2, 40(sp)
+    lw a3, 44(sp)
+    lw a4, 48(sp)
+    lw a5, 52(sp)
+    lw a6, 56(sp)
+    lw a7, 60(sp)
     lw t1, 12(sp)
     lw a7, 8(sp)
     lw a1, 4(sp) # Recupera a1
     lw a0, 0(sp) # Recupera a0
     addi sp, sp, 64 # Desaloca espaço da pilha
     csrrw sp, mscratch, sp # Troca sp com mscratch novamente
-    csrr t0, mepc  # carrega endereço de retorno (endereço 
-                    # da instrução que invocou a Syscall)
-    addi t0, t0, 4 # soma 4 no endereço de retorno (para retornar após a ecall) 
-    csrw mepc, t0  # armazena endereço de retorno de volta no mepc
+
     mret           # Recuperar o restante do contexto (pc <- mepc)
 
 #-------------------------SYSCALLS--------------------------------------------------------- 

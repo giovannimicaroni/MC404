@@ -63,18 +63,19 @@ puts:
     mv t1, a0
     mv a1, a0
     li t0, 0
-    li a2, 0
+    li a2, 1
     1:
         lb t2, 0(t1)
-        beq t2, t0, 2f
+        beq t2, t0, hahaahha
+        mv a1, t1
         li a7, 18
         li a0, 1
         ecall
+    kekw:
         addi t1, t1, 1
-        addi a2, a2, 1
         j 1b
-    2:
-        li a1, '\n'
+    hahaahha:
+        la a1, barra_n
         li a7, 18
         li a0, 1
         ecall
@@ -151,7 +152,7 @@ approx_sqrt:
     ret
 
 
-
+barra_n: .ascii "\n"
 
 
 

@@ -1,9 +1,10 @@
 
-string: .ascii "123\0"
-
 .text
-.globl _start
-_start:
+.globl main
+main:
     la a0, string
-    jal atoi
+    jal puts
     alou:
+        j alou
+
+string: .ascii "123\n\0"
