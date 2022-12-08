@@ -77,7 +77,7 @@ filter_1d_image:
         mul a3, a3, t5 #multiplica o valor do segundo pixel pelo ultimo valor do filtro
         add a3, a3, a4 #soma o valor do pixel da direita com o da esquerda com o filtro aplicado
         add a2, a2, a3 #soma os valores obtidos aplicando o filtro
-        
+
         bgt a2, t0, 1f
         blt a2, zero, 2f
         j guarda   
@@ -163,9 +163,13 @@ atoi:
         bne t2, t0, 2f #se o byte nao é espaço, pula
         j 1b
     2:
+        li a5, '-'
+        li a4, 0
         li t0, '0'
         li t1, '9'
         li t5, 0
+        beq t2, a5, negativo
+
     3:
         beq t2, t5, 5f #se o byte é o \0, pula pra 5
         blt t2, t0, 4f #se o byte é menor que '0', pula para 4
@@ -177,8 +181,15 @@ atoi:
         lb t2, 0(a1)
         addi a1, a1, 1
         j 3b
-    
+
+    negativo:
+        li a4, 1
+        j 4b
     5:
+        beq a4, zero, fim
+        li t0, -1
+        mul t3, t3, t0
+        fim:
         mv a0, t3
         ret
 
@@ -198,7 +209,7 @@ itoa:
 
     decimal:
         beq t0, t3, inverte #se o resultado da divisao for 0, acabou e basta inverter a string
-        rem t1, t0, t2 #resto da divisao do numero atual por 10 em t1
+        remu t1, t0, t2 #resto da divisao do numero atual por 10 em t1
         addi t1, t1, '0' #soma '0' ao resto da divisao para ter o caracter do numero em t1
         sb t1, 0(t4) #guarda o caracter no buffer
         divu t0, t0, t2 #divide o numero atual por 10 e guarda nele mesmo
@@ -210,7 +221,7 @@ itoa:
         li t5, 10
         1:
         beq t0, t3, inverte #se o resultado da divisao for 0, acabou e basta inverter a string
-        rem t1, t0, t2 #resto da divisao do numero atual por 16 em t1
+        remu t1, t0, t2 #resto da divisao do numero atual por 16 em t1
         blt t1, t5, 2f #se o resto da divisao for menor que 10, vai para 2f
         addi t1, t1, -10 #caso contrario, subtrai 10 do resto e soma com o caracter
         addi t1, t1, 'a' # 'a', para obter a letra representativa do valor em hexadecimal
