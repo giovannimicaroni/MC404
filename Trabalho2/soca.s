@@ -37,7 +37,7 @@ int_handler:
     sw a4, 48(sp)
     sw a5, 52(sp)
     sw a6, 56(sp)
-    sw a7, 60(sp)
+  
 
     #Tratamento das Syscalls  
     li t1, 10
@@ -79,7 +79,6 @@ int_handler:
     lw a4, 48(sp)
     lw a5, 52(sp)
     lw a6, 56(sp)
-    lw a7, 60(sp)
     lw t1, 12(sp)
     lw a7, 8(sp)
     lw a1, 4(sp) # Recupera a1

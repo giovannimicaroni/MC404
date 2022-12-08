@@ -3,10 +3,10 @@
 .align 4
 .globl main
 main:
-    la a0, buffer
-    jal puts
-    aaa:
-        j aaa
+    li a0, 121
+    li a1, 10
+    jal approx_sqrt
+    hahaha:
 
 
 .align 4
