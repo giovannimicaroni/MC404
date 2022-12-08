@@ -49,7 +49,55 @@ get_time:
 #---------------------PROCESSAMENTO DE IMAGEM------------------
 .globl filter_1d_image
 filter_1d_image:
-    ret
+    #a0 -> array representando a imagem; a1 -> vetor de 3 posiçoes representando o filtro 1D
+    li t0, 255 #tamanho da imagem é sempre 256
+    mv t6, a0 #imagem em t6
+    li t1, 0
+    lb t3, 0(a1) #valor do filtro posiçao 0 em t3
+    lb t4, 1(a1) #valor do filtro posiçao 1 em t4
+    lb t5, 2(a1) #valor do filtro posiçao 2 em t5
+
+    lbu a2, 0(t6) #carrega o valor do primeiro pixel
+    addi sp, sp, -4
+    sb a2, 0(sp) #salva o valor do primeiro pixel inalterado na pilha
+    sb t1, 0(t6) #coloca preto no primeiro pixel
+    addi t6, t6, 1
+    addi t1, t1, 1
+
+    pixeis_intermediarios:
+        beq t1, t0, pixel_final
+        lbu a4, 0(sp)#carrega o pixel a esquerda, da pilha (ultimo atual inalterado)
+        mul a4, a4, t3 #multiplica o pixel a esquerda pelo primeiro valor do filtro
+
+        lbu a2, 0(t6) #carrega o pixel atual
+        sb a2, 0(sp) #salva o pixel atual inalterado
+        mul a2, a2, t4 #multiplica o valor do primeiro pixel pelo valor do meio do filtro
+
+        lbu a3, 1(t6) #carrega o pixel a direita
+        mul a3, a3, t5 #multiplica o valor do segundo pixel pelo ultimo valor do filtro
+        add a3, a3, a4 #soma o valor do pixel da direita com o da esquerda com o filtro aplicado
+        add a2, a2, a3 #soma os valores obtidos aplicando o filtro
+        
+        bgt a2, t0, 1f
+        blt a2, zero, 2f
+        j guarda   
+        
+        1:
+            li a2, 255
+            j guarda
+        2:
+            li a2, 0
+
+        guarda:    
+        sb a2, 0(t6) #guarda o valor obtido no pixel atual
+        addi t6, t6, 1
+        addi t1, t1, 1
+        j pixeis_intermediarios
+
+    pixel_final:
+        sb zero, 0(t6) #coloca preto no ultimo pixel
+        addi sp, sp, 4 #desaloca o espaço usado da pilha
+        ret
 
 .globl display_image
 display_image:
